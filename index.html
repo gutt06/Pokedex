@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokedex</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div>
+            <h1>Bem vindo à nossa Pokedex!</h1>
+            <p>Digite o nome ou ID do pokemon que deseja buscar:</p>
+        </div>
+        <div class="campo-pesquisa">
+            <input type="text" id="pesquisar" placeholder="Nome ou ID do pokemon">
+            <button id="btn-pesquisar">Buscar</button>
+        </div>
+        <div class="pokedex-app">
+            <div id="pokemon-info" class="hidden">
+                <img src="" alt="imagem do pokemon" id="pokemon-img">
+                <h2 id="pokemon-name"></h2>
+                <p id="pokemon-desc"></p>
+            </div>
+            <div class="btns-nav hidden">
+                <button id="btn-previous">Pokemon Anterior</button>
+                <button id="btn-next">Próximo Pokemon</button>
+            </div>
+            <div id="msg-erro" class="hidden">
+                <p>404 NOT FOUND - Pokemon ou ID não encontrado</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
