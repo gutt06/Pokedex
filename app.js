@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const btnAnterior = document.getElementById('btn-previous');
     const btnProximo = document.getElementById('btn-next');
     const pokemonInfo = document.getElementById('pokemon-info');
-    const btnsNav = document.getElementById('btns-nav');
+    const btnsNav = document.querySelector('.btns-nav');
     const pokemonImg = document.getElementById('pokemon-img');
     const pokemonNome = document.getElementById('pokemon-name');
     const pokemonDesc = document.getElementById('pokemon-desc');
@@ -13,9 +13,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
     const fetchPokemon = async (identificadorPokemon) => {
         try{
-            const response = await fetch(`https://pokeapi.co/api/v2/${identificadorPokemon}`);
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${identificadorPokemon}`);
 
-            if(!response.ok) throw new Error(msgErro);
+            if(!response.ok) throw new Error('Pokemon não encontrado');
 
             const pokemon = await response.json();
             preencherPokemonInfo(pokemon);
@@ -30,7 +30,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     };
 
     const preencherPokemonInfo = (pokemon) => {
-        pokemonImg.src = pokemon['sprites']['versions']['generation-v']['black-white']['animated']['front_default'];
+        const sprite = pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default;
+        pokemonImg.src = sprite;
         pokemonNome.textContent = `${pokemon.name} (#${pokemon.id})`;
         pokemonDesc.textContent = `
         Altura: ${pokemon.height / 10}m
@@ -51,7 +52,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     };
     
     const atualizarNavBtns = () => {
-        btnAnterior.disabled = (idAtual <= 1); // true ou false
+        //btnAnterior.disabled = (idAtual <= 1); // true ou false
     };
 
     const atualizarBtnPesquisar = () => {
@@ -76,11 +77,17 @@ document.addEventListener('DOMContentLoaded', ()=>{
     btnAnterior.addEventListener('click', () => {
         if(idAtual > 1) {
             fetchPokemon(idAtual - 1);
+        } else {
+            fetchPokemon(1025); // volta para o pokemon de id 1025
         }
     });
 
     btnProximo.addEventListener('click', () => {
+       if (idAtual < 1025) {
         fetchPokemon(idAtual + 1);
+        } else {
+        fetchPokemon(1); // volta para o pokemon de id 1
+        }
     });
 
     fetchPokemon(idAtual); // carregando o primeiro pokemon de id = 1 por padrão
