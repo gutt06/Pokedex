@@ -22,269 +22,73 @@
         .editable:hover { background-color: rgba(255, 255, 255, 0.1); cursor: pointer; }
         .edit-input { 
             background: rgba(255, 255, 255, 0.0); color: white;
-            width: fit-content;
             border: none;
         }
         .edit-input:focus, input:focus, select:focus {
             box-shadow: 0 0 0 0;
             border: 0 none;
             outline: 0;
-        } 
+        }
     </style>
 </head>
 <body class="h-screen bg-green-500">
     
-    <!-- ID do Pokemon - Position Absolute ocupando toda a tela -->
-    <div class="absolute -top-[8rem] inset-0 flex items-center justify-center pointer-events-none">
-        <span id="pokemon-id-display" class="text-white text-[38rem] font-bold select-none">#0001</span>
-        <input id="pokemon-id-edit" class="hidden text-[38rem] font-bold text-center edit-input rounded px-4" 
+    <!-- ID do Pokemon gigante no fundo -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <span id="pokemon-id-display" class="text-white text-[40rem] font-bold select-none leading-none opacity-30">#0001</span>
+        <span id="error-display" class="hidden text-white text-[20rem] font-bold select-none leading-none opacity-30">NOT FOUND</span>
+        <input id="pokemon-id-edit" class="hidden text-[40rem] font-bold text-center edit-input leading-none opacity-30" 
                onblur="saveId()" onkeypress="checkEnter(event, 'id')" maxlength="4">
     </div>
 
+    <div class="absolute inset-0 flex items-start mt-8 justify-center pointer-events-none">
+        <span id="pokemon-id-display" class="text-white text-[2rem] font-bold select-none leading-none opacity-20">Space to insert ID</span>
+    </div>
+
     <!-- Container principal -->
-    <div class="relative top-[14rem] z-10 h-screen flex items-center justify-center p-8">
-        <div class="w-full max-w-6xl gap-12 items-center h-full">
+    <div class="relative z-10 h-screen flex items-center justify-center">
+        <div class="w-full max-w-7xl px-16">
             
-            <!-- Lado esquerdo - Imagem e informações do Pokemon -->
-            <div class="text-center w-6xl lg:text-left">
-                <div class="mb">
-                    <img id="pokemon-img" src="" alt="Imagem do Pokemon" 
-                         class="w-80 h-80 mx-auto lg:mx-0 object-contain drop-shadow-2xl">
-                </div>
-                <div class="flex w-full justify-between">
-                    <div class="flex items-center gap-6 text-white">
-                        <h1 id="pokemon-name" class="text-6xl font-bold uppercase tracking-wider editable hover:bg-white hover:bg-opacity-10 rounded px-2 py-1 cursor-pointer transition-all duration-200" 
+            <!-- Layout principal - imagem + info à esquerda, about à direita -->
+            <div class="flex items-center justify-between">
+                
+                <!-- Lado esquerdo - Imagem e informações -->
+                <div class="flex flex-col items-start gap-4">
+                    <!-- Imagem do Pokemon -->
+                    <div class="relative z-20">
+                        <img id="pokemon-img" src="" alt="Imagem do Pokemon" 
+                             class="w-80 h-80 object-contain drop-shadow-2xl">
+                    </div>
+                    
+                    <!-- Informações do Pokemon -->
+                    <div class="text-white">
+                        <h1 id="pokemon-name" class="text-8xl abs font-bold uppercase tracking-wider editable hover:bg-white hover:bg-opacity-10 rounded px-2 py-1 cursor-pointer transition-all duration-200" 
                             onclick="editName()">BULBASAUR</h1>
-                        <input id="pokemon-name-edit" class="hidden text-6xl font-bold uppercase bg-opacity-0 tracking-wider edit-input rounded px-2 py-1 w-full" 
+                        <input id="pokemon-name-edit" class="hidden text-8xl font-bold uppercase tracking-wider edit-input rounded px-2 py-1" 
                             onblur="saveName()" onkeypress="checkEnter(event, 'name')">
-                        <div id="pokemon-stats" class="text-2xl opacity-60 font-medium">
+                        
+                        <div id="pokemon-stats" class="text-2xl font-medium space-y-1 px-2 py-1 ">
                             <p>HEIGHT - <span id="pokemon-height">0.7M</span></p>
                             <p>WEIGHT - <span id="pokemon-weight">6.9KG</span></p>
                             <p>TYPE - <span id="pokemon-type">GRASS, POISON</span></p>
                         </div>
                     </div>
-                    <div class="text-white flex items-center">
-                        <div class="">
-                            <h2 class="text-5xl font-bold uppercase tracking-wider">ABOUT</h2>
-                            <p id="pokemon-description" class="text-xl w-[30rem] font-medium">
-                                A STRANGE SEED WAS PLANTED ON ITS BACK AT BIRTH. THE PLANT SPROUTS AND GROWS WITH THIS POKÉMON.
-                            </p>
-                        </div>
+                </div>
+                
+                <!-- Lado direito - About -->
+                <div class="flex flex-col h-full mt-auto items-end">
+                    <div class="text-white text-right px-2 py-1">
+                        <h2 class="text-8xl font-bold uppercase tracking-wider mb-6">ABOUT</h2>
+                        <p id="pokemon-description" class="text-2xl font-medium max-w-xl leading-relaxed">
+                            A STRANGE SEED WAS PLANTED ON ITS BACK AT BIRTH. THE PLANT SPROUTS AND GROWS WITH THIS POKÉMON.
+                        </p>
                     </div>
                 </div>
             </div>
-
-            <!-- Lado direito - About -->
         </div>
     </div>
 
-    <!-- Mensagem de erro -->
-    <div id="msg-erro" class="hidden fixed inset-0 bg-red-500 flex items-center justify-center z-50">
-        <div class="text-white text-center">
-            <h2 class="text-6xl font-bold mb-4">404</h2>
-            <p class="text-2xl">POKÉMON NÃO ENCONTRADO</p>
-        </div>
-    </div>
 
-    <!-- Navegação -->
-    <div class="fixed hidden bottom-8 left-1/2 transform -translate-x-1/2 z-20">
-        <div class="flex gap-4">
-            <button id="btn-previous" class="bg-white bg-opacity-20 text-white px-6 py-3 rounded-full font-bold hover:bg-opacity-30 transition-all duration-200">
-                ← ANTERIOR
-            </button>
-            <button id="btn-next" class="bg-white bg-opacity-20 text-white px-6 py-3 rounded-full font-bold hover:bg-opacity-30 transition-all duration-200">
-                PRÓXIMO →
-            </button>
-        </div>
-    </div>
-
-    <script>
-        let idAtual = 1;
-        let isEditing = false;
-
-        // Listener global para a tecla ESPAÇO
-        document.addEventListener('keydown', function(event) {
-            if (event.code === 'Space' && !isEditing) {
-                event.preventDefault(); // Previne scroll da página
-                editId();
-            }
-        });
-
-        // Função para editar o ID (agora ativa com ESPAÇO)
-        function editId() {
-            if (isEditing) return;
-            isEditing = true;
-            const display = document.getElementById('pokemon-id-display');
-            const input = document.getElementById('pokemon-id-edit');
-            
-            input.value = display.textContent.replace('#', '').padStart(4, '0');
-            display.classList.add('hidden');
-            input.classList.remove('hidden');
-            input.focus();
-            input.select();
-        }
-
-        // Função para salvar o ID
-        function saveId() {
-            if (!isEditing) return;
-            isEditing = false;
-            
-            const display = document.getElementById('pokemon-id-display');
-            const input = document.getElementById('pokemon-id-edit');
-            const newId = parseInt(input.value) || 1;
-            
-            if (newId >= 1 && newId <= 1025) {
-                fetchPokemon(newId);
-            }
-            
-            input.classList.add('hidden');
-            display.classList.remove('hidden');
-        }
-
-        // Função para editar o nome
-        function editName() {
-            if (isEditing) return;
-            isEditing = true;
-            const display = document.getElementById('pokemon-name');
-            const input = document.getElementById('pokemon-name-edit');
-            
-            input.value = display.textContent;
-            display.classList.add('hidden');
-            input.classList.remove('hidden');
-            input.focus();
-            input.select();
-        }
-
-        // Função para salvar o nome
-        function saveName() {
-            if (!isEditing) return;
-            isEditing = false;
-            
-            const display = document.getElementById('pokemon-name');
-            const input = document.getElementById('pokemon-name-edit');
-            const newName = input.value.trim().toLowerCase();
-            
-            if (newName) {
-                fetchPokemon(newName);
-            }
-            
-            input.classList.add('hidden');
-            display.classList.remove('hidden');
-        }
-
-        // Função para verificar Enter nos inputs
-        function checkEnter(event, type) {
-            if (event.key === 'Enter') {
-                event.preventDefault(); // Previne comportamento padrão
-                if (type === 'id') {
-                    saveId();
-                } else if (type === 'name') {
-                    saveName();
-                }
-            }
-        }
-
-        // Função para buscar Pokemon
-        const fetchPokemon = async (identificadorPokemon) => {
-            try {
-                const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${identificadorPokemon}`);
-                
-                if (!response.ok) throw new Error('Pokemon não encontrado');
-                
-                const pokemon = await response.json();
-                
-                const descResponse = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${identificadorPokemon}`);
-                if (!descResponse.ok) throw new Error('Descrição não encontrada');
-                
-                const pokemonSpecies = await descResponse.json();
-                
-                preencherPokemonInfo(pokemon, pokemonSpecies);
-                
-                document.getElementById('msg-erro').classList.add('hidden');
-                
-            } catch (error) {
-                exibirErro();
-            }
-        };
-
-        // Função para preencher informações do Pokemon
-        const preencherPokemonInfo = (pokemon, pokemonSpecies) => {
-            const sprite = pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default;
-            document.getElementById('pokemon-img').src = sprite;
-            
-            document.getElementById('pokemon-name').textContent = pokemon.name.toUpperCase();
-            document.getElementById('pokemon-id-display').textContent = `#${pokemon.id.toString().padStart(4, '0')}`;
-            
-            document.getElementById('pokemon-height').textContent = `${pokemon.height / 10}M`;
-            document.getElementById('pokemon-weight').textContent = `${pokemon.weight / 10}KG`;
-            document.getElementById('pokemon-type').textContent = pokemon.types.map(typeInfo => typeInfo.type.name.toUpperCase()).join(', ');
-            
-            const flavorEntry = pokemonSpecies.flavor_text_entries.find(
-                entry => entry.language.name === "en"
-            );
-            
-            document.getElementById('pokemon-description').textContent = flavorEntry
-                ? flavorEntry.flavor_text.replace(/[\n\f]/g, ' ').toUpperCase()
-                : "DESCRIÇÃO NÃO ENCONTRADA.";
-            
-            idAtual = pokemon.id;
-            
-            // Atualizar cor de fundo baseada no tipo principal
-            const primaryType = pokemon.types[0].type.name;
-            updateBackgroundColor(primaryType);
-        };
-
-        // Função para atualizar cor de fundo
-        function updateBackgroundColor(type) {
-            const colors = {
-                grass: 'bg-green-500',
-                fire: 'bg-red-500',
-                water: 'bg-blue-500',
-                electric: 'bg-yellow-500',
-                psychic: 'bg-pink-500',
-                ice: 'bg-cyan-400',
-                dragon: 'bg-purple-600',
-                dark: 'bg-gray-800',
-                fairy: 'bg-pink-300',
-                normal: 'bg-gray-400',
-                fighting: 'bg-red-700',
-                poison: 'bg-purple-500',
-                ground: 'bg-yellow-600',
-                flying: 'bg-indigo-400',
-                bug: 'bg-green-400',
-                rock: 'bg-yellow-800',
-                ghost: 'bg-purple-800',
-                steel: 'bg-gray-500'
-            };
-            
-            const body = document.body;
-            // Remove todas as classes de cor
-            Object.values(colors).forEach(color => body.classList.remove(color));
-            // Adiciona a nova cor
-            body.classList.add(colors[type] || 'bg-green-500');
-        }
-
-        // Função para exibir erro
-        const exibirErro = () => {
-            document.getElementById('msg-erro').classList.remove('hidden');
-            setTimeout(() => {
-                document.getElementById('msg-erro').classList.add('hidden');
-            }, 3000);
-        };
-
-        // Navegação
-        document.getElementById('btn-previous').addEventListener('click', () => {
-            const newId = idAtual > 1 ? idAtual - 1 : 1025;
-            fetchPokemon(newId);
-        });
-
-        document.getElementById('btn-next').addEventListener('click', () => {
-            const newId = idAtual < 1025 ? idAtual + 1 : 1;
-            fetchPokemon(newId);
-        });
-
-        // Carregar Pokemon inicial
-        fetchPokemon(1);
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
