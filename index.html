@@ -3,39 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokedex</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Pokédex</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        *{
+             font-family: 'Bebas Neue', sans-serif;
+        }
+        html, body {
+            height: 100vh;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        .hidden { display: none; }
+        .editable:hover { background-color: rgba(255, 255, 255, 0.1); cursor: pointer; }
+        .edit-input { 
+            background: rgba(255, 255, 255, 0.0); color: white;
+            border: none;
+        }
+        .edit-input:focus, input:focus, select:focus {
+            box-shadow: 0 0 0 0;
+            border: 0 none;
+            outline: 0;
+        }
+    </style>
 </head>
-<style>
-    .hidden {
-    display: none;
-    }
-</style>
-<body>
-    <div class="container">
-        <div>
-            <h1>Bem vindo à nossa Pokedex!</h1>
-            <p>Digite o nome ou ID do pokemon que deseja buscar:</p>
-        </div>
-        <div class="campo-pesquisa">
-            <input type="text" id="pesquisar" placeholder="Nome ou ID do pokemon">
-            <button id="btn-pesquisar">Buscar</button>
-        </div>
-        <div class="pokedex-app">
-            <div id="pokemon-info" class="hidden">
-                <img src="" alt="imagem do pokemon" id="pokemon-img">
-                <h2 id="pokemon-name"></h2>
-                <p id="pokemon-desc"></p>
-            </div>
-            <div class="btns-nav hidden">
-                <button id="btn-previous">Pokemon Anterior</button>
-                <button id="btn-next">Próximo Pokemon</button>
-            </div>
-            <div id="msg-erro" class="hidden">
-                <p>404 NOT FOUND - Pokemon ou ID não encontrado</p>
+<body class="h-screen bg-green-500">
+    
+    <!-- ID do Pokemon gigante no fundo -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <span id="pokemon-id-display" class="text-white text-[40rem] font-bold select-none leading-none opacity-30">#0001</span>
+        <span id="error-display" class="hidden text-white text-[20rem] font-bold select-none leading-none opacity-30">NOT FOUND</span>
+        <input id="pokemon-id-edit" class="hidden text-[40rem] font-bold text-center edit-input leading-none opacity-30" 
+               onblur="saveId()" onkeypress="checkEnter(event, 'id')" maxlength="4">
+    </div>
+
+    <div class="absolute inset-0 flex items-start mt-8 justify-center pointer-events-none">
+        <span id="pokemon-id-display" class="text-white text-[2rem] font-bold select-none leading-none opacity-20">Space to insert ID</span>
+    </div>
+
+    <!-- Container principal -->
+    <div class="relative z-10 h-screen flex items-center justify-center">
+        <div class="w-full max-w-7xl px-16">
+            
+            <!-- Layout principal - imagem + info à esquerda, about à direita -->
+            <div class="flex items-center justify-between">
+                
+                <!-- Lado esquerdo - Imagem e informações -->
+                <div class="flex flex-col items-start gap-4">
+                    <!-- Imagem do Pokemon -->
+                    <div class="relative z-20">
+                        <img id="pokemon-img" src="" alt="Imagem do Pokemon" 
+                             class="w-80 h-80 object-contain drop-shadow-2xl">
+                    </div>
+                    
+                    <!-- Informações do Pokemon -->
+                    <div class="text-white">
+                        <h1 id="pokemon-name" class="text-8xl abs font-bold uppercase tracking-wider editable hover:bg-white hover:bg-opacity-10 rounded px-2 py-1 cursor-pointer transition-all duration-200" 
+                            onclick="editName()">BULBASAUR</h1>
+                        <input id="pokemon-name-edit" class="hidden text-8xl font-bold uppercase tracking-wider edit-input rounded px-2 py-1" 
+                            onblur="saveName()" onkeypress="checkEnter(event, 'name')">
+                        
+                        <div id="pokemon-stats" class="text-2xl font-medium space-y-1 px-2 py-1 ">
+                            <p>HEIGHT - <span id="pokemon-height">0.7M</span></p>
+                            <p>WEIGHT - <span id="pokemon-weight">6.9KG</span></p>
+                            <p>TYPE - <span id="pokemon-type">GRASS, POISON</span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lado direito - About -->
+                <div class="flex flex-col h-full mt-auto items-end">
+                    <div class="text-white text-right px-2 py-1">
+                        <h2 class="text-8xl font-bold uppercase tracking-wider mb-6">ABOUT</h2>
+                        <p id="pokemon-description" class="text-2xl font-medium max-w-xl leading-relaxed">
+                            A STRANGE SEED WAS PLANTED ON ITS BACK AT BIRTH. THE PLANT SPROUTS AND GROWS WITH THIS POKÉMON.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
 
     <script src="app.js"></script>
 </body>
